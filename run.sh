@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 #lein run http://nrk.no/nordlandsbanen/
 #lein run http://nrk.no/nordlandsbanen/media/js/videoPlayer.js

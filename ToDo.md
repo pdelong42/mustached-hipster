@@ -1,8 +1,10 @@
  - learn how to write a stream to a file;
 
  - learn how to do pattern replacement in strings;
+   - DONE... a little bit
 
  - learn how to capture a pattern from a string;
+   - DONE... a little bit
 
  - do some actual error/exception checking; particularly, handle these exceptions:
 

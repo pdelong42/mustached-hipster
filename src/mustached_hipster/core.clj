@@ -1,7 +1,6 @@
 (ns mustached-hipster.core
-   (:use
-      [clojure.string  :only [join split split-lines trim]]
-      [clj-http.client :only [get]])
+   (:use [clojure.string :only [join split split-lines trim]])
+   (:require [clj-http.client :as http :only [get]])
    (:gen-class))
 
 (defn -main
@@ -17,4 +16,4 @@
             #(first (split (trim %) #"\?"))
             (filter
                #(not= \# (first %))
-               (split-lines (:body (get url))))))))
+               (split-lines (:body (http/get url))))))))

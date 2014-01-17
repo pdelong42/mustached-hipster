@@ -9,13 +9,13 @@
    ;; work around dangerous default behaviour in Clojure
    (alter-var-root #'*read-eval* (constantly false))
 
-   (with-open
-      [out (clojure.java.io/writer "foo.txt")]
-      (.write out
+   (spit "foo.txt"
+      (str
          (join
             "\n"
             (map
                #(first (split (trim %) #"\?"))
                (filter
                   #(not= \# (first %))
-                  (split-lines (:body (http/get url)))))))))
+                  (split-lines (:body (http/get url))))))
+         "\n")))

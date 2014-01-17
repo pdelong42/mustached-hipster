@@ -10,12 +10,9 @@
    (alter-var-root #'*read-eval* (constantly false))
 
    (spit "foo.txt"
-      (str
-         (join
-            "\n"
-            (map
-               #(first (split (trim %) #"\?"))
-               (filter
-                  #(not= \# (first %))
-                  (split-lines (:body (http/get url))))))
-         "\n")))
+      (apply str
+         (map
+            #(str (first (split (trim %) #"\?")) "\n")
+            (filter
+               #(not= \# (first %))
+               (split-lines (:body (http/get url))))))))

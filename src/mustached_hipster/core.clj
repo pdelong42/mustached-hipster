@@ -9,10 +9,15 @@
    ;; work around dangerous default behaviour in Clojure
    (alter-var-root #'*read-eval* (constantly false))
 
-   (spit "foo.txt"
-      (apply str
-         (map
-            #(str (first (split (trim %) #"\?")) "\n")
-            (filter
-               #(not= \# (first %))
-               (split-lines (:body (http/get url))))))))
+   (let
+      [then (System/nanoTime)]
+
+      (spit "foo.txt"
+         (apply str
+            (map
+               #(str (first (split (trim %) #"\?")) "\n")
+               (filter
+                  #(not= \# (first %))
+                  (split-lines (:body (http/get url)))))))
+
+      (println "the whole thing took" (/ (- (System/nanoTime) then) 1e-9) "seconds")))

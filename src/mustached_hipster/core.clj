@@ -20,4 +20,4 @@
                   #(not= \# (first %))
                   (split-lines (:body (http/get url)))))))
 
-      (println "the whole thing took" (/ (- (System/nanoTime) then) 1e-9) "seconds")))
+      (println "the whole thing took" (* (- (System/nanoTime) then) 1e-9) "seconds")))

@@ -6,13 +6,20 @@
 (defn get-playlist
    [m3u8]
 
-   (let
-      [before (System/nanoTime)]
+   (let [
+      before (System/nanoTime)
+      after #(* (- (System/nanoTime) before) 1e-9)
+      grab-and-process (comp
+         (partial map #(s/replace % #"\?.*" "\n"))
+         (partial filter #(not= \# (first %)))
+         s/split-lines
+         :body
+         http/get)]
 
       (let
-         [response (http/get m3u8)]
-         (println "the request took" (* (- (System/nanoTime) before) 1e-9) "seconds")
-         response)))
+         [playlist (grab-and-process m3u8)]
+         (println "the request took" (after) "seconds")
+         playlist)))
 
 (defn -main
    [url]
@@ -21,14 +28,10 @@
    (alter-var-root #'*read-eval* (constantly false))
 
    (let
-      [not-comment #(not= \# (first %))
-       chop-query  #(s/replace % #"\?.*" "\n") ]
+      [post-process (comp
+         (partial spit "foo.txt")
+         (partial apply str)
+         (partial take 10)
+         get-playlist)]
 
-      (spit "foo.txt"
-         (apply str
-            (take 10
-               (map chop-query
-                  (filter not-comment
-                     (s/split-lines
-                        (:body
-                           (get-playlist url))))))))))
+      (post-process url)))

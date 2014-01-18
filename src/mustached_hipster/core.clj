@@ -1,5 +1,5 @@
 (ns mustached-hipster.core
-   (:require [clojure.string  :as s    :only [replace split-lines]])
+   (:require [clojure.string  :only [replace split-lines]])
    (:require [clj-http.client :as http :only [get]])
    (:gen-class))
 
@@ -8,17 +8,17 @@
 
    (let [
       before (System/nanoTime)
-      after #(* (- (System/nanoTime) before) 1e-9)
+      elapsed #(* (- (System/nanoTime) before) 1e-9)
       grab-and-process (comp
-         (partial map #(s/replace % #"\?.*" "\n"))
+         (partial map #(clojure.string/replace % #"\?.*" "\n"))
          (partial filter #(not= \# (first %)))
-         s/split-lines
+         clojure.string/split-lines
          :body
          http/get)]
 
       (let
          [playlist (grab-and-process m3u8)]
-         (println "the request took" (after) "seconds")
+         (println "fetching the playlist request took" (elapsed) "seconds")
          playlist)))
 
 (defn -main

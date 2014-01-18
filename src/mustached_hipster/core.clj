@@ -1,5 +1,5 @@
 (ns mustached-hipster.core
-   (:use [clojure.string :only [join split split-lines trim]])
+   (:require [clojure.string  :as s    :only [replace split-lines]])
    (:require [clj-http.client :as http :only [get]])
    (:gen-class))
 
@@ -10,14 +10,14 @@
    (alter-var-root #'*read-eval* (constantly false))
 
    (let
-      [then (System/nanoTime)]
+      [before (System/nanoTime)]
 
       (spit "foo.txt"
-         (apply str
+         (apply str (take 10
             (map
-               #(str (first (split (trim %) #"\?")) "\n")
+               #(s/replace % #"\?.*" "\n")
                (filter
                   #(not= \# (first %))
-                  (split-lines (:body (http/get url)))))))
+                  (s/split-lines (:body (http/get url))))))))
 
-      (println "the whole thing took" (* (- (System/nanoTime) then) 1e-9) "seconds")))
+      (println "the whole thing took" (* (- (System/nanoTime) before) 1e-9) "seconds")))

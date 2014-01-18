@@ -20,10 +20,15 @@
    ;; work around dangerous default behaviour in Clojure
    (alter-var-root #'*read-eval* (constantly false))
 
-   (spit "foo.txt"
-      (apply str (take 10
-         (map
-            #(s/replace % #"\?.*" "\n")
-            (filter
-               #(not= \# (first %))
-               (s/split-lines (:body (get-playlist url)))))))))
+   (let
+      [not-comment #(not= \# (first %))
+       chop-query  #(s/replace % #"\?.*" "\n") ]
+
+      (spit "foo.txt"
+         (apply str
+            (take 10
+               (map chop-query
+                  (filter not-comment
+                     (s/split-lines
+                        (:body
+                           (get-playlist url))))))))))

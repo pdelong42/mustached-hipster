@@ -18,8 +18,16 @@
 
       (let
          [playlist (grab-and-process m3u8)]
-         (println "fetching the playlist request took" (elapsed) "seconds")
+         (println "successfully fetched the playlist in" (elapsed) "seconds")
          playlist)))
+
+(defn get-segment
+   [seg-url]
+
+   (let
+      [filename (clojure.string/replace (clojure.string/trim-newline seg-url) #".*/" "")]
+      (spit filename (:body (http/get seg-url)))
+      (println "successfully fetched" filename)))
 
 (defn -main
    [url]
@@ -29,9 +37,9 @@
 
    (let
       [post-process (comp
-         (partial spit "foo.txt")
-         (partial apply str)
-         (partial take 10)
+         (partial dorun)
+         (partial map get-segment)
+         (partial take 100) ; for debugging purposes only - remove later
          get-playlist)]
 
       (post-process url)))

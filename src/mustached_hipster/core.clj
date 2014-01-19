@@ -1,6 +1,8 @@
 (ns mustached-hipster.core
-   (:require [clojure.string  :only [replace split-lines]])
-   (:require [clj-http.client :as http :only [get]])
+   (:require
+      [clj-http.client :as http :only [get]]
+      [clojure.java.io :only [output-stream]]
+      [clojure.string  :only [replace split-lines]])
    (:gen-class))
 
 (defn get-playlist
@@ -26,8 +28,12 @@
 
    (let
       [filename (clojure.string/replace (clojure.string/trim-newline seg-url) #".*/" "")]
-      (spit filename (:body (http/get seg-url)))
-      (println "successfully fetched" filename)))
+
+      (with-open
+         [whandle (clojure.java.io/output-stream filename)]
+
+         (.write whandle (:body (http/get seg-url {:as :byte-array})))
+         (println "successfully fetched" filename))))
 
 (defn -main
    [url]
@@ -39,7 +45,7 @@
       [post-process (comp
          (partial dorun)
          (partial map get-segment)
-         (partial take 100) ; for debugging purposes only - remove later
+         (partial take 2) ; for debugging purposes only - remove later
          get-playlist)]
 
       (post-process url)))

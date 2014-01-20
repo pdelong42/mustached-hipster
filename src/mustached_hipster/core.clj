@@ -19,10 +19,11 @@
          http/get)]
 
       (let [
-          playlist (grab-and-process m3u8)
-          elapsed (- (after) before)]
+         playlist (grab-and-process m3u8)
+         elapsed (- (after) before)
+         seconds (* elapsed 1e-9)]
 
-         (println "successfully fetched the playlist in" (* elapsed 1e-9) "seconds")
+         (println "successfully fetched the playlist in" seconds "seconds")
          playlist)))
 
 (defn get-segment
@@ -33,16 +34,17 @@
       after #(System/nanoTime)
       filename (clojure.string/replace (clojure.string/trim-newline seg-url) #".*/" "")]
 
-      (with-open [
-         whandle (clojure.java.io/output-stream filename)]
+      (with-open
+         [whandle (clojure.java.io/output-stream filename)]
+
+         (.write whandle (:body (http/get seg-url {:as :byte-array})))
 
          (let [
             elapsed (- (after) before)
-            millisec (long (* elapsed 1e-6))]
+            seconds (* elapsed 1e-9)]
 
-            (.write whandle (:body (http/get seg-url {:as :byte-array})))
-            (println "successfully fetched" filename "in" millisec "ms (pausing for the same amount of time)")
-            (Thread/sleep millisec)))))
+            (println "successfully fetched" filename "in" seconds "seconds (pausing for the same amount of time)")
+            (Thread/sleep (long (* 1000 seconds)))))))
 
 (defn -main
    [url]
@@ -54,7 +56,7 @@
       [post-process (comp
          (partial dorun)
          (partial map get-segment)
-         (partial take 2) ; for debugging purposes only - remove later
+         (partial take 9) ; for debugging purposes only - remove later
          get-playlist)]
 
       (post-process url)))
